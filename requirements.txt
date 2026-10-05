@@ -1,0 +1,9 @@
+# Match the versions used to train models
+scikit-learn==1.9.1
+xgboost>=2.0.0
+pandas==2.2.2
+numpy==1.26.4
+fastapi==0.115.0
+uvicorn==0.30.6
+pydantic==2.9.2
+joblib==1.4.2

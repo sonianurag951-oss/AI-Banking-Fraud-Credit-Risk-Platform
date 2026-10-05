@@ -1,0 +1,38 @@
+
+services:
+  # FastAPI Backend
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: credit-risk-api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./Models:/app/Models
+    restart: unless-stopped
+    networks:
+      - credit-risk-network
+
+  # Streamlit Frontend
+  streamlit:
+    build:
+      context: .
+      dockerfile: Dockerfile.streamlit
+    container_name: credit-risk-streamlit
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./Models:/app/Models
+      - ./streamlit_app.py:/app/streamlit_app.py
+    depends_on:
+      - api
+    environment:
+      - API_URL=http://api:8000
+    restart: unless-stopped
+    networks:
+      - credit-risk-network
+
+networks:
+  credit-risk-network:
+    driver: bridge

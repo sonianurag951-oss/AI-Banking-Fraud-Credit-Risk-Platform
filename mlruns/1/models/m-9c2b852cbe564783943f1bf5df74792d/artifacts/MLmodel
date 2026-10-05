@@ -1,0 +1,22 @@
+artifact_path: file:D:/deep learning/AI Banking Fraud & Credit-Risk Platform/mlruns/1/models/m-9c2b852cbe564783943f1bf5df74792d/artifacts
+flavors:
+  python_function:
+    data: model.ubj
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.xgboost
+    python_version: 3.12.10
+  xgboost:
+    code: null
+    data: model.ubj
+    model_class: xgboost.sklearn.XGBClassifier
+    model_format: ubj
+    xgb_version: 3.4.1
+mlflow_version: 3.16.1
+model_id: m-9c2b852cbe564783943f1bf5df74792d
+model_size_bytes: 1031012
+model_uuid: m-9c2b852cbe564783943f1bf5df74792d
+prompts: null
+run_id: 8feeb2de1b4e4087a013deb52fb376d2
+utc_time_created: '2026-10-05 09:36:52.204171'
