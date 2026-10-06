@@ -32,7 +32,7 @@ st.markdown("""
         margin-bottom: 2rem;
     }
     .risk-low {
-        background-color:#15803D;
+        background-color: #15803D;
         padding: 1rem;
         border-radius: 10px;
         border-left: 5px solid #28a745;
@@ -131,7 +131,7 @@ with st.sidebar:
     
     menu = st.radio(
         "Choose a page:",
-        ["🏠 Home", "📊 Predict Loan Risk", "📈 Model Performance"],
+        ["🏠 Home", "📊 Predict Loan Risk", "📈 Model Features"],
         label_visibility="collapsed"
     )
     
@@ -373,27 +373,7 @@ elif menu == "📊 Predict Loan Risk":
         elif st.session_state.example == "high_risk":
             st.info("**High Risk Example:** Credit Score: 520, Income: ₹35,000/month, 3 defaults")
 
-elif menu == "📈 Model Performance":
-    st.title("📈 Model Performance & Comparison")
-    
-    st.subheader("🏆 Model Comparison")
-    
-    comparison_df = pd.DataFrame({
-        'Model': ['XGBoost', 'Random Forest', 'Logistic Regression', 'ANN'],
-        'Precision': [0.791, 0.765, 0.723, 0.746],
-        'Recall': [0.773, 0.742, 0.689, 0.712],
-        'F1 Score': [0.782, 0.754, 0.706, 0.729],
-        'ROC-AUC': [0.857, 0.823, 0.785, 0.801]
-    })
-    
-    st.dataframe(
-        comparison_df.style.format({'Precision': '{:.3f}', 'Recall': '{:.3f}', 'F1 Score': '{:.3f}', 'ROC-AUC': '{:.3f}'})
-        .highlight_max(subset=['Precision', 'Recall', 'F1 Score', 'ROC-AUC'], axis=0),
-        use_container_width=True,
-        hide_index=True
-    )
-    
-    st.success("🏆 **Best Model: XGBoost** with ROC-AUC of 0.857")
+elif menu == "📈 Model Features":
     
     if model is not None and hasattr(model, 'feature_importances_'):
         st.subheader("🔍 Feature Importance")
