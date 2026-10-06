@@ -32,7 +32,7 @@ st.markdown("""
         margin-bottom: 2rem;
     }
     .risk-low {
-        background-color: #d4edda;
+        background-color:#15803D;
         padding: 1rem;
         border-radius: 10px;
         border-left: 5px solid #28a745;
