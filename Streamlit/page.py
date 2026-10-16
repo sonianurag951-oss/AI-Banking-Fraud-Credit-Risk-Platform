@@ -7,6 +7,7 @@ import requests
 from PIL import Image
 import warnings
 warnings.filterwarnings('ignore')
+from chatbot import render_chatbot
 
 st.set_page_config(
     page_title="Credit Risk Prediction",
@@ -130,97 +131,20 @@ with st.sidebar:
     st.title("Navigation")
     
     menu = st.radio(
-        "Choose a page:",
-        ["🏠 Home", "📊 Predict Loan Risk", "📈 Model Features"],
-        label_visibility="collapsed"
-    )
+    "Choose a page:",
+    [
+        "📊 Predict Loan Risk",
+        
+        "🤖 AI Copilot"
+    ],
+    label_visibility="collapsed"
+   )
     
     st.divider()
     
-    if model_loaded:
-        st.success("✅ Model Loaded")
-    else:
-        st.error("❌ Model Not Loaded")
     
-    st.info("""
-    **Model Details:**
-    - Algorithm: XGBoost
-    - Features: 17
-    - ROC-AUC: 0.85+
-    - Trained on: 5,000 loans
-    """)
 
-if menu == "🏠 Home":
-    st.markdown('<p class="main-header">🏦 Credit Risk Prediction Platform</p>', unsafe_allow_html=True)
-    st.markdown('<p class="sub-header">AI-Powered Loan Default Risk Assessment using Machine Learning</p>', unsafe_allow_html=True)
-    
-    st.markdown("---")
-    
-    col1, col2, col3, col4 = st.columns(4)
-    
-    with col1:
-        st.metric(label="Model Accuracy", value="85.6%", delta="High Performance")
-    with col2:
-        st.metric(label="ROC-AUC Score", value="0.857", delta="Excellent")
-    with col3:
-        st.metric(label="Training Samples", value="5,000", delta="Loans")
-    with col4:
-        st.metric(label="Features", value="17", delta="Engineered")
-    
-    st.markdown("---")
-    
-    st.subheader("🎯 Key Features")
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.markdown("""
-        ### ✅ What We Offer
-        
-        - **Instant Risk Assessment**: Get loan default predictions in seconds
-        - **Explainable AI**: Understand WHY a loan is risky using SHAP values
-        - **Multiple Models**: Compare XGBoost, Random Forest, Logistic Regression, and ANN
-        - **Production Ready**: FastAPI backend for integration
-        
-        ### 📊 Model Comparison
-        
-        | Model | ROC-AUC | F1 Score |
-        |-------|---------|----------|
-        | XGBoost | 0.857 | 0.782 |
-        | Random Forest | 0.823 | 0.754 |
-        | Logistic Regression | 0.785 | 0.706 |
-        | ANN | 0.801 | 0.729 |
-        """)
-    
-    with col2:
-        st.markdown("""
-        ### 🔧 Features Used
-        
-        **Financial:**
-        - Loan Amount & Term
-        - Interest Rate
-        - Monthly Income
-        - Existing Debt
-        - Debt-to-Income Ratio
-        
-        **Credit History:**
-        - Credit Score
-        - Previous Defaults
-        - Late Payments
-        - Account Tenure
-        
-        **Demographics:**
-        - Age
-        - Employment Type
-        - Dependents
-        - City
-        """)
-    
-    st.markdown("---")
-    st.markdown("### 🚀 Ready to Predict Loan Risk?")
-    st.markdown("Navigate to **📊 Predict Loan Risk** from the sidebar to start!")
-
-elif menu == "📊 Predict Loan Risk":
+if menu == "📊 Predict Loan Risk":
     st.title("📊 Loan Risk Prediction")
     st.markdown("Enter loan application details to get instant default risk assessment")
     
@@ -373,37 +297,14 @@ elif menu == "📊 Predict Loan Risk":
         elif st.session_state.example == "high_risk":
             st.info("**High Risk Example:** Credit Score: 520, Income: ₹35,000/month, 3 defaults")
 
-elif menu == "📈 Model Features":
     
-    if model is not None and hasattr(model, 'feature_importances_'):
-        st.subheader("🔍 Feature Importance")
-        
-        feature_cols = [
-            'loan_amount', 'loan_term', 'interest_rate', 'monthly_income',
-            'existing_debt', 'previous_defaults', 'late_payments',
-            'age', 'income', 'credit_score', 'account_tenure', 'dependents',
-            'debt_to_income', 'loan_to_income', 'payment_burden', 'risk_score',
-            'employment_type_encoded'
-        ]
-        
-        importance_df = pd.DataFrame({
-            'Feature': feature_cols,
-            'Importance': model.feature_importances_
-        }).sort_values('Importance', ascending=False)
-        
-        st.bar_chart(importance_df.set_index('Feature').head(10), use_container_width=True)
-        
-        st.markdown("**Top 5 Most Important Features:**")
-        st.write("1. Credit Score\n2. Risk Score\n3. Late Payments\n4. Debt-to-Income Ratio\n5. Previous Defaults")
-    
-    st.subheader("📊 Model Evaluation Metrics")
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.metric("True Positives", "387", "Correctly identified defaults")
-        st.metric("True Negatives", "612", "Correctly identified non-defaults")
-    
-    with col2:
-        st.metric("False Positives", "89", "Incorrectly flagged as default")
-        st.metric("False Negatives", "112", "Missed defaults")
+elif menu == "🤖 AI Copilot":
+    st.title("🤖 AI Banking Risk Copilot")
+    st.markdown(
+        "Ask questions about credit risk, fraud detection, "
+        "machine learning, and model explainability."
+    )
+
+    st.divider()
+
+    render_chatbot()

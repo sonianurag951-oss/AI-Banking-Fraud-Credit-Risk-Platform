@@ -147,9 +147,7 @@ models = {
 # TRAIN & EVALUATE ALL MODELS 
 results = []
 
-print("\n" + "="*70)
 print("MODEL COMPARISON - CREDIT RISK PREDICTION")
-print("="*70)
 
 for name, model in models.items():
     print(f"\n{'='*50}")
@@ -189,9 +187,7 @@ for name, model in models.items():
     print(f"Avg Precision: {avg_prec:.4f}")
 
 #  ANN MODEL
-print("\n" + "="*70)
 print("Training: ANN (Neural Network)")
-print("="*70)
 
 EarlyStopping(
     monitor="val_loss",
@@ -256,14 +252,10 @@ print(f"Avg Precision: {ann_avg_prec:.4f}")
 # shap value
 # RESULTS DATAFRAME
 results_df = pd.DataFrame(results)
-print("\n" + "="*70)
 print("FINAL COMPARISON TABLE")
-print("="*70)
 print(results_df.to_string(index=False))
 
-print("\n" + "="*70)
 print("SHAP MODEL EXPLAINABILITY")
-print("="*70)
 
 # Use Logistic Regression (best model)
 model_to_explain = models['Logistic Regression']
