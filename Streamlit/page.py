@@ -6,7 +6,7 @@ os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "3")
 warnings.filterwarnings("ignore")
 
 import joblib
-import keras
+from tensorflow import keras
 import pandas as pd
 import streamlit as st
 
