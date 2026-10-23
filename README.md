@@ -1,773 +1,313 @@
-# 🏦 AI Banking Fraud & Credit Risk Platform
+# 🏦 AI Banking Fraud & Credit-Risk Platform
 
-> **An end-to-end Machine Learning platform for intelligent fraud detection and financial risk analysis, combining ML, Explainable AI, experiment tracking, API serving, and containerized deployment.**
+An end-to-end machine-learning project for banking risk. It predicts **loan default risk** from customer and loan data, explains the model with **SHAP**, tracks experiments with **MLflow**, serves predictions through a **FastAPI** service and a **Streamlit** app, and includes an **AI Copilot** that answers questions about the banking database through a validated, read-only natural-language-to-SQL pipeline (**Ollama + PostgreSQL**).
 
-![Python](https://img.shields.io/badge/Python-3.x-blue?logo=python)
-![Machine Learning](https://img.shields.io/badge/Machine%20Learning-Scikit--learn-orange)
-![Explainable AI](https://img.shields.io/badge/XAI-SHAP-purple)
+![Python](https://img.shields.io/badge/Python-3.12-blue?logo=python)
+![TensorFlow](https://img.shields.io/badge/ANN-Keras%20%2F%20TensorFlow-orange?logo=tensorflow)
+![XGBoost](https://img.shields.io/badge/ML-XGBoost%20%7C%20scikit--learn-green)
+![SHAP](https://img.shields.io/badge/XAI-SHAP-purple)
 ![MLflow](https://img.shields.io/badge/MLOps-MLflow-blue)
 ![FastAPI](https://img.shields.io/badge/API-FastAPI-009688?logo=fastapi)
-![Docker](https://img.shields.io/badge/Deployment-Docker-2496ED?logo=docker)
 ![Streamlit](https://img.shields.io/badge/UI-Streamlit-FF4B4B?logo=streamlit)
-![Status](https://img.shields.io/badge/Project-Portfolio%20Project-success)
+![PostgreSQL](https://img.shields.io/badge/DB-PostgreSQL-336791?logo=postgresql)
 
 ---
 
-## 📌 Project Overview
+## 📌 What is implemented
 
-The **AI Banking Fraud & Credit Risk Platform** is an end-to-end AI/ML project designed to demonstrate how machine learning can be applied to financial security and risk assessment.
-
-The platform focuses on two important banking use cases:
-
-- 🔴 **Fraud Detection** — identifying potentially fraudulent financial transactions.
-- 🟡 **Credit/Risk Analysis** — estimating financial risk based on customer and transaction-related features.
-
-Rather than stopping at model training, the project follows an engineering-oriented workflow:
-
-```text
-Data
-  ↓
-Data Cleaning & Validation
-  ↓
-Exploratory Data Analysis
-  ↓
-Feature Engineering
-  ↓
-Model Training
-  ↓
-Model Evaluation
-  ↓
-Explainable AI (SHAP)
-  ↓
-MLflow Experiment Tracking
-  ↓
-FastAPI Model Serving
-  ↓
-Docker
-  ↓
-Streamlit Dashboard
-```
-
-The goal is to demonstrate the complete journey from **raw financial data to an explainable machine-learning prediction system**.
-
----
-
-# 🎯 Objectives
-
-The main objectives of this project are:
-
-- Detect potentially fraudulent transactions.
-- Analyze financial/customer risk.
-- Perform meaningful feature engineering.
-- Handle class imbalance in fraud detection.
-- Compare machine-learning models using appropriate metrics.
-- Use probability-based risk scoring rather than relying only on accuracy.
-- Provide model explanations using **SHAP**.
-- Track experiments and model artifacts using **MLflow**.
-- Serve trained models through an API layer using **FastAPI**.
-- Containerize the application using **Docker**.
-- Provide an interactive interface using **Streamlit**.
-- Build a foundation for a real-time financial intelligence system.
-
----
-
-# 🚨 Why Fraud Detection Is Challenging
-
-Fraud detection is fundamentally different from many standard classification problems.
-
-In a typical banking dataset:
-
-```text
-Legitimate transactions  >>>  Fraudulent transactions
-```
-
-This creates **class imbalance**.
-
-For example, a model could achieve very high accuracy simply by predicting most transactions as legitimate.
-
-Therefore, this project focuses on metrics that are more meaningful for fraud detection:
-
-- Precision
-- Recall
-- F1-score
-- ROC-AUC
-- PR-AUC / Average Precision
-- Confusion Matrix
-
-### Why Recall Matters
-
-For fraud detection:
-
-> Missing a fraudulent transaction can be much more costly than investigating a legitimate transaction.
-
-Therefore, the model should not be evaluated using accuracy alone.
-
----
-
-# 🧠 Machine Learning Pipeline
-
-## 1. Data Ingestion
-
-Financial transaction/customer data is loaded and prepared for analysis.
-
-```text
-Raw Data
-   ↓
-Validation
-   ↓
-Cleaning
-   ↓
-Transformation
-```
-
----
-
-## 2. Data Preprocessing
-
-The preprocessing pipeline handles tasks such as:
-
-- Missing-value handling
-- Categorical encoding
-- Numerical scaling
-- Feature transformation
-- Data validation
-- Train/test splitting
-
-The objective is to ensure that the same preprocessing logic can be applied consistently during inference.
-
----
-
-# ⚙️ Feature Engineering
-
-Feature engineering is one of the most important parts of this project.
-
-Instead of relying only on raw transaction fields, additional behavioral and risk-related features can be derived.
-
-Examples include:
-
-### Transaction Amount Ratio
-
-```text
-amount_ratio =
-transaction_amount / average_transaction_amount
-```
-
-This helps identify transactions that are unusually large compared with historical behavior.
-
-### Unusual Transaction Hour
-
-Transactions occurring during unusual hours can contribute to a higher risk score.
-
-### High-Amount Indicator
-
-A binary feature can identify unusually large transactions.
-
-### Risk Score
-
-Multiple behavioral signals can be combined into a derived risk-related feature.
-
-Feature engineering allows the model to learn **patterns of suspicious behavior**, rather than simply memorizing individual transaction values.
-
----
-
-# 🤖 Machine Learning Models
-
-The project is designed around classification models suitable for tabular financial data.
-
-Potential model families include:
-
-- Logistic Regression
-- Decision Tree
-- Random Forest
-- Gradient Boosting / XGBoost
-- Other suitable classification models
-
-The models are compared using fraud-focused evaluation metrics rather than relying only on accuracy.
-
----
-
-# 📊 Model Evaluation
-
-The following metrics are used to evaluate model performance:
-
-| Metric | Purpose |
+| Module | Status |
 |---|---|
-| Precision | How many predicted fraud cases were actually fraud |
-| Recall | How many actual fraud cases were detected |
-| F1 Score | Balance between precision and recall |
-| ROC-AUC | Overall ranking capability |
-| PR-AUC | Useful for imbalanced fraud datasets |
-| Confusion Matrix | Detailed classification analysis |
-
-### Example Evaluation Concept
-
-```text
-                 Actual
-              Fraud   Legit
-Pred Fraud      TP      FP
-Pred Legit      FN      TN
-```
-
-The objective is to reduce dangerous **False Negatives (FN)** while maintaining an acceptable false-positive rate.
+| Loan default / credit-risk model (LR, Random Forest, XGBoost, ANN) | ✅ Implemented |
+| SHAP explainability and MLflow experiment tracking | ✅ Implemented |
+| FastAPI prediction service (single and batch) | ✅ Implemented |
+| Streamlit loan-risk app | ✅ Implemented |
+| AI Copilot: natural language → validated read-only SQL (Ollama + PostgreSQL) | ✅ Implemented |
+| Transaction feature engineering (`is_night`, `amount_ratio`, `high_amount`) | ✅ Built, not yet used by a model |
+| Transaction fraud classifier | 🚧 Planned |
 
 ---
 
-# 🔍 Explainable AI with SHAP
+## 🏗️ Architecture
 
-A major component of the platform is **Explainable AI (XAI)** using SHAP.
-
-Traditional ML prediction:
-
-```text
-Transaction → Fraud
-```
-
-Explainable prediction:
-
-```text
-Transaction
-     ↓
-Fraud Probability: 0.91
-     ↓
-SHAP Explanation
-     ↓
-┌──────────────────────────────┐
-│ High transaction amount      │ → Higher risk
-│ Unusual transaction time     │ → Higher risk
-│ High transaction ratio       │ → Higher risk
-│ Normal historical behavior   │ → Lower risk
-└──────────────────────────────┘
-```
-
-SHAP helps answer an important banking question:
-
-> **"Why did the model classify this transaction as risky?"**
-
-This makes the system more interpretable and useful for financial-risk analysis.
-
----
-
-# 🧪 MLflow Experiment Tracking
-
-The project integrates **MLflow** to support the machine-learning lifecycle.
-
-MLflow can be used to track:
-
-- Experiments
-- Parameters
-- Metrics
-- Model artifacts
-- Model versions
-- Training runs
-
-Conceptually:
-
-```text
-Experiment
-    ↓
-Training Run
-    ├── Parameters
-    ├── Metrics
-    ├── Artifacts
-    └── Model
-```
-
-This makes it easier to compare different experiments and reproduce model-development results.
-
-The repository also contains an `mlruns` directory for MLflow artifacts.
-
----
-
-# 🚀 FastAPI Model Serving
-
-The project includes a FastAPI layer for exposing machine-learning functionality through an API.
-
-Conceptual inference flow:
-
-```text
-Client / Banking System
-          ↓
-       FastAPI
-          ↓
- Feature Engineering
-          ↓
-    Trained Model
-          ↓
-   Fraud Probability
-          ↓
-    Risk Decision
-          ↓
-     API Response
-```
-
-A production-oriented API can accept transaction information and return:
-
-```json
-{
-  "prediction": "fraud",
-  "fraud_probability": 0.91,
-  "risk_level": "high"
-}
-```
-
-> **Note:** Keep the exact endpoint names and request schema synchronized with the implementation in the repository.
-
----
-
-# 🖥️ Streamlit Dashboard
-
-The Streamlit application provides an interactive interface for demonstrating model predictions.
-
-Possible workflow:
-
-```text
-Enter Transaction Details
-          ↓
-Submit Prediction
-          ↓
-ML Model
-          ↓
-Fraud Probability
-          ↓
-Risk Classification
-          ↓
-SHAP Explanation
-```
-
-The repository contains a dedicated `Streamlit` directory and a separate Streamlit Docker configuration.
-
----
-
-# 🐳 Docker Deployment
-
-The project is containerized using Docker.
-
-Repository components include:
-
-```text
-Dockerfile
-Dockerfile.streamlit
-docker-compose.yml
-.dockerignore
-build_and_run.bat
-```
-
-This allows the application environment to be packaged consistently across machines.
-
-### Container Architecture
-
-```text
-                 Docker Environment
-                        │
-            ┌───────────┴───────────┐
-            ↓                       ↓
-       ML/API Service          Streamlit UI
-            │                       │
-            └───────────┬───────────┘
-                        ↓
-                  ML Model
+```mermaid
+flowchart LR
+    A[("CSV data<br/>loans, customers, transactions")] --> B["src/project.py<br/>features, training, SHAP, MLflow"]
+    B --> C["Models/<br/>credit_risk_ann.keras + scaler.pkl"]
+    C --> D["FastAPI<br/>src/app.py"]
+    C --> E["Streamlit<br/>Streamlit/page.py"]
+    E --> F["AI Copilot<br/>chatbot.py"]
+    F --> G["sql_tools.py<br/>generate, validate, run read-only"]
+    G --> H[("PostgreSQL")]
+    F --> I["Ollama<br/>llama3.2:3b"]
+    G --> I
 ```
 
 ---
 
-# 📁 Project Structure
+## 📁 Project structure
 
 ```text
 AI-Banking-Fraud-Credit-Risk-Platform/
-│
-├── Data/
-│   └── Dataset files
-│
-├── Models/
-│   └── Trained model artifacts
-│
-├── Results/
-│   ├── Evaluation results
-│   └── Analysis outputs
-│
-├── Streamlit/
-│   └── Streamlit application
-│
+├── Data/                  loans.csv, customers.csv, transactions.csv
+├── Models/                credit_risk_ann.keras, scaler.pkl (+ LR / RF / XGBoost pickles)
+├── Results/               SHAP plots
 ├── src/
-│   ├── Data processing
-│   ├── Feature engineering
-│   ├── Model training
-│   └── Prediction logic
-│
-├── mlruns/
-│   └── MLflow experiment artifacts
-│
-├── Dockerfile
-├── Dockerfile.streamlit
-├── docker-compose.yml
-├── .dockerignore
-├── build_and_run.bat
-├── requirements.txt
-├── requirements_streamlit.txt
+│   ├── project.py         training pipeline (features, 4 models, SHAP, MLflow)
+│   └── app.py             FastAPI service
+├── Streamlit/
+│   ├── page.py            Streamlit app (entry point)
+│   ├── chatbot.py         AI Copilot interface and question routing
+│   └── sql_tools.py       text → SQL, validation, read-only execution
+├── Sql/
+│   └── test_sql.py        checks the PostgreSQL connection
+├── Dockerfile, Dockerfile.streamlit, docker-compose.yml
+├── requirements.txt            API runtime
+├── requirements_streamlit.txt  Streamlit app
+├── requirements-train.txt      training (includes requirements.txt)
+├── .env.example
 └── README.md
 ```
-
-The current GitHub repository contains these major project directories and deployment files.
-
----
-
-# 🛠️ Technology Stack
-
-## Programming
-
-- Python
-
-## Data Science
-
-- Pandas
-- NumPy
-- Matplotlib
-- Seaborn
-
-## Machine Learning
-
-- Scikit-learn
-- XGBoost
-
-## Explainable AI
-
-- SHAP
-
-## MLOps
-
-- MLflow
-
-## API
-
-- FastAPI
-
-## Deployment
-
-- Docker
-- Docker Compose
-
-## UI
-
-- Streamlit
+<!-- VERIFY: keep the Docker line only if those files are up to date with the ANN model and the new requirements files. -->
 
 ---
 
-# ⚙️ Installation
+## 🗂️ Dataset
 
-## 1. Clone the repository
+Three tables are used (CSV files in `Data/`, also loaded into PostgreSQL for the Copilot):
+
+| Table | Columns |
+|---|---|
+| `customers` | customer_id, age, income, employment_type, credit_score, account_tenure, city, dependents |
+| `loans` | loan_id, customer_id, loan_amount, loan_term, interest_rate, monthly_income, existing_debt, previous_defaults, late_payments, **default** |
+| `transactions` | transaction_id, customer_id, amount, transaction_time, merchant_category, payment_method, location, device_type, is_fraud |
+
+The prediction target is `loans.default` (1 = the customer defaulted).
+
+<!-- Add the data source here: synthetic data generated for this project, or a Kaggle / public link. -->
+
+---
+
+## 🧠 Modelling
+
+### Features (17)
+
+Raw columns plus engineered ratios:
+
+| Feature | Meaning |
+|---|---|
+| `debt_to_income` | existing debt ÷ monthly income |
+| `loan_to_income` | loan amount ÷ annual income |
+| `payment_burden` | loan amount ÷ loan term (months) |
+| `risk_score` | weighted mix of credit score, debt-to-income, previous defaults and late payments |
+| `employment_type_encoded` | employment type as an integer |
+
+### Models compared
+
+Logistic Regression, Random Forest, XGBoost and an ANN (64-32-16-1 with dropout, early stopping and balanced class weights).
+
+### Evaluation setup
+
+- 80/20 stratified train/test split with a fixed seed.
+- The scaler is fitted on the training set only (no data leakage).
+- Class imbalance handled with `class_weight="balanced"` (LR, RF, ANN) and `scale_pos_weight` (XGBoost).
+- Metrics: Precision, Recall, F1, ROC-AUC and Average Precision (accuracy alone is misleading on imbalanced data).
+- Optional stability check: a bootstrap on the test set shows whether the top model is really ahead of the runner-up (`RUN_STABILITY_CHECK` in `src/project.py`).
+
+### Results
+
+| Model | Precision | Recall | F1 | ROC-AUC |
+|---|---|---|---|---|
+| Logistic Regression | — | — | — | — |
+| Random Forest | — | — | — | — |
+| XGBoost | — | — | — | — |
+| ANN | — | — | — | — |
+
+<!-- Fill this table from the "FINAL COMPARISON TABLE" printed by src/project.py. -->
+
+The differences between the top models are small, so no single model is claimed to be clearly best without the stability check.
+
+### Explainability (SHAP)
+
+![SHAP feature importance](Results/shap_feature_importance.png)
+![SHAP beeswarm](Results/shap_summary_beeswarm.png)
+
+SHAP is computed for the Logistic Regression model, and optionally for the ANN (`RUN_ANN_SHAP`).
+
+### Risk decision rule
+
+The deployed ANN returns a default probability, which is mapped to a decision:
+
+| Default probability | Category | Recommendation |
+|---|---|---|
+| < 0.30 | Low Risk | Approve loan |
+| 0.30 – 0.60 | Medium Risk | Review manually |
+| ≥ 0.60 | High Risk | Reject loan |
+
+---
+
+## 🚀 FastAPI service
+
+Interactive docs are available at `http://localhost:8000/docs` once the server is running.
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| GET | `/` | Service status |
+| GET | `/health` | Whether the model and scaler are loaded |
+| POST | `/predict` | Risk for one loan application |
+| POST | `/predict-batch` | Risk for a list of applications |
+
+Request validation uses Pydantic (for example `credit_score` must be 300–850 and `employment_type` one of Salaried, Self-employed, Student, Unemployed, Retired).
+
+Example request:
+
+```json
+{
+  "loan_amount": 500000,
+  "loan_term": 36,
+  "interest_rate": 12.5,
+  "monthly_income": 75000,
+  "existing_debt": 150000,
+  "previous_defaults": 0,
+  "late_payments": 2,
+  "age": 32,
+  "income": 900000,
+  "credit_score": 720,
+  "account_tenure": 5,
+  "dependents": 2,
+  "employment_type": "Salaried"
+}
+```
+
+Example response (values are illustrative; `input_data` also contains the engineered features):
+
+```json
+{
+  "prediction": 0,
+  "default_probability": 0.1443,
+  "risk_category": "Low Risk",
+  "recommendation": "Approve loan"
+}
+```
+
+---
+
+## 🖥️ Streamlit app
+
+- **Predict Loan Risk:** a form for loan and applicant details, with live debt-to-income and loan-to-income. It shows the default probability, risk category, recommendation and rule-based risk factors (low credit score, high debt-to-income, previous defaults, late payments).
+- **AI Copilot:** a chat interface for banking-risk questions and database questions.
+
+---
+
+## 🤖 AI Copilot (Ollama + PostgreSQL)
+
+Questions are routed in `chatbot.py`:
+
+- **General questions** (fraud, credit risk, SHAP, MLflow, metrics) go to a local Ollama model (`llama3.2:3b`) with a system prompt that forbids inventing predictions or metrics.
+- **Data questions** ("how many fraudulent transactions?", "top 10 largest transactions") go through the SQL pipeline in `sql_tools.py`.
+
+How the SQL pipeline keeps queries safe:
+
+1. The model generates a single PostgreSQL `SELECT` for a fixed schema.
+2. `sqlglot` parses it and rejects anything that is not one plain `SELECT` (no multiple statements, CTEs, `SELECT INTO`, locks, or INSERT / UPDATE / DELETE / DDL).
+3. Only the approved tables `customers`, `loans`, `transactions` in the `public` schema are allowed, plus a short list of safe functions.
+4. `LIMIT` is enforced (maximum 100 rows).
+5. The query runs in a **read-only transaction** with a 5-second statement timeout.
+6. The answer is summarised from the returned rows only. Common questions also have regex-based fallback SQL, which goes through the same validation.
+
+> The SQL safety layer is a validator in front of the database, not a substitute for database permissions. Use a dedicated **read-only PostgreSQL user** for this app.
+
+---
+
+## ⚙️ Setup
+
+Requirements: Python 3.12 (the pinned versions were tested together on 3.12), PostgreSQL and [Ollama](https://ollama.com) for the Copilot.
 
 ```bash
 git clone https://github.com/sonianurag951-oss/AI-Banking-Fraud-Credit-Risk-Platform.git
-```
-
-```bash
 cd AI-Banking-Fraud-Credit-Risk-Platform
-```
 
----
-
-## 2. Create a virtual environment
-
-### Windows
-
-```bash
 python -m venv venv
+venv\Scripts\activate            # Windows
+# source venv/bin/activate       # Linux / macOS
+
+pip install -r requirements-train.txt -r requirements_streamlit.txt
 ```
 
-Activate it:
+### Configure the Copilot
 
 ```bash
-venv\Scripts\activate
+copy .env.example .env           # Windows   (cp .env.example .env on Linux / macOS)
 ```
 
-### Linux / macOS
+Fill in the PostgreSQL settings in `.env`, load the three CSV files into PostgreSQL as `public.customers`, `public.loans` and `public.transactions`, then check the connection and pull the model:
 
 ```bash
-python3 -m venv venv
-```
-
-```bash
-source venv/bin/activate
+python Sql/test_sql.py
+ollama pull llama3.2:3b
 ```
 
 ---
 
-## 3. Install dependencies
+## ▶️ Run
+
+Run everything from the project root.
+
+**1. Train the models** (creates `Models/` and `Results/`):
 
 ```bash
-pip install -r requirements.txt
+python src/project.py
 ```
 
-For the Streamlit application:
+**2. Start the API:**
 
 ```bash
-pip install -r requirements_streamlit.txt
+uvicorn app:app --reload --app-dir src
 ```
 
----
-
-# ▶️ Running the Project
-
-## Train the model
-
-Run the appropriate training script from the `src` directory:
+**3. Start the Streamlit app** (second terminal):
 
 ```bash
-python src/train.py
+streamlit run Streamlit/page.py
 ```
 
-> Adjust the filename if the training entry point in your repository uses a different name.
+The Streamlit app loads the model itself, so it also works without the API running.
 
----
-
-## Run Streamlit
-
-From the Streamlit directory:
-
-```bash
-streamlit run app.py
-```
-
----
-
-## Run FastAPI
-
-If your API entry point is `main.py`:
-
-```bash
-uvicorn main:app --reload
-```
-
-The API documentation can then be accessed through FastAPI's interactive documentation.
-
-> Update this command to match the actual API entry-point file in the repository.
-
----
-
-# 🐳 Running with Docker
-
-Build the application:
-
-```bash
-docker build -t ai-banking-fraud-platform .
-```
-
-Run the container:
-
-```bash
-docker run -p 8000:8000 ai-banking-fraud-platform
-```
-
-For a multi-service setup:
+### Docker (optional)
 
 ```bash
 docker compose up --build
 ```
-
-Stop the services:
-
-```bash
-docker compose down
-```
+<!-- VERIFY: run this once and keep the section only if it works. -->
 
 ---
 
-# 🔄 End-to-End Prediction Architecture
+## ⚠️ Limitations
 
-The intended architecture of the platform is:
-
-```text
-                  ┌──────────────────────┐
-                  │  Banking Transaction │
-                  └──────────┬───────────┘
-                             ↓
-                  ┌──────────────────────┐
-                  │       FastAPI        │
-                  └──────────┬───────────┘
-                             ↓
-                  ┌──────────────────────┐
-                  │ Feature Engineering │
-                  └──────────┬───────────┘
-                             ↓
-                  ┌──────────────────────┐
-                  │    ML Prediction     │
-                  └──────────┬───────────┘
-                             ↓
-                  ┌──────────────────────┐
-                  │   Fraud Probability  │
-                  └──────────┬───────────┘
-                             ↓
-                  ┌──────────────────────┐
-                  │    SHAP Explanation  │
-                  └──────────┬───────────┘
-                             ↓
-                  ┌──────────────────────┐
-                  │   Risk Classification│
-                  └──────────┬───────────┘
-                             ↓
-                  ┌──────────────────────┐
-                  │   Streamlit / Client │
-                  └──────────────────────┘
-```
+- Model performance is modest (ROC-AUC in the low 0.7s) and the top models are close to each other.
+- Probability thresholds (0.3 / 0.6) are heuristic. The ANN is trained with class weights, so its probabilities are not calibrated.
+- The transaction fraud model is not built yet; only the transaction features exist.
+- Copilot routing is keyword-based. A small local LLM can write valid but wrong SQL: the validator blocks unsafe queries, not incorrect ones.
+- SHAP explanations are generated at training time and are not shown inside the Streamlit app yet.
+- This is an educational / portfolio project. It must not be used for real lending decisions.
 
 ---
 
-# 📈 Future Improvements
+## 🗺️ Roadmap
 
-The platform can be extended toward a more production-oriented financial intelligence system.
-
-### Planned Improvements
-
-- [ ] PostgreSQL transaction storage
-- [ ] Real-time transaction ingestion
-- [ ] Model monitoring
-- [ ] Data drift detection
-- [ ] Automated retraining
-- [ ] CI/CD pipeline
-- [ ] Authentication and authorization
-- [ ] Transaction history dashboard
-- [ ] Alert/notification system
-- [ ] Model version management
+- [ ] Fraud classifier on transactions (time-based split, precision-recall focus)
+- [ ] Probability calibration and cost-based threshold selection
+- [ ] Per-prediction SHAP reasons in the Streamlit app
+- [ ] Shared feature module used by training, API and UI
+- [ ] Automated tests (features, API, SQL validator) and CI
+- [ ] Copilot calling the prediction API as a tool
 - [ ] Cloud deployment
-- [ ] Kafka/event-streaming integration for high-volume transaction processing
 
 ---
 
-# 🔐 Security & Responsible Use
+## 👨‍💻 Author
 
-This project is intended for **educational, portfolio, and demonstration purposes**.
+**Anurag Soni** — B.Tech CSE student interested in machine learning and AI engineering.
 
-A production banking system would require additional controls, including:
+GitHub: [@sonianurag951-oss](https://github.com/sonianurag951-oss)
 
-- Secure authentication
-- Authorization
-- Encryption
-- Sensitive-data protection
-- Audit logging
-- Model governance
-- Bias/fairness evaluation
-- Regulatory compliance
-- Human review for high-risk decisions
-
-The model should not be treated as the sole decision-maker for real financial transactions.
-
----
-
-# 💡 Key Learning Outcomes
-
-Through this project, I worked with concepts across the complete machine-learning lifecycle:
-
-### Machine Learning
-
-- Classification
-- Feature engineering
-- Imbalanced datasets
-- Model comparison
-- Probability-based predictions
-- Evaluation metrics
-
-### Explainable AI
-
-- SHAP
-- Feature importance
-- Individual prediction explanations
-
-### MLOps
-
-- MLflow
-- Experiment tracking
-- Model artifacts
-- Reproducibility
-
-### Deployment
-
-- FastAPI
-- Streamlit
-- Docker
-- Docker Compose
-
-### Software Engineering
-
-- Modular project structure
-- Separation of training and inference
-- Dependency management
-- Containerized execution
-
----
-
-# 🎯 Why This Project Matters
-
-This project goes beyond a simple:
-
-```text
-Dataset → Model → Accuracy
-```
-
-It demonstrates an end-to-end AI/ML workflow:
-
-```text
-Data
- ↓
-Engineering
- ↓
-Machine Learning
- ↓
-Evaluation
- ↓
-Explainability
- ↓
-Experiment Tracking
- ↓
-API
- ↓
-Containerization
- ↓
-Interactive Application
-```
-
-This makes the project suitable for demonstrating practical skills for **AI/ML Engineer, Machine Learning Engineer, and Data Science fresher roles**.
-
----
-
-# 👨‍💻 Resume Highlights
-
-You can describe the project on your resume as:
-
-> **AI Banking Fraud & Credit Risk Platform** — Developed an end-to-end machine learning platform for financial fraud and risk analysis using Python, Scikit-learn/XGBoost, SHAP, MLflow, FastAPI, Docker, and Streamlit. Implemented feature engineering and fraud-focused evaluation using precision, recall, F1-score, ROC-AUC, and explainable AI techniques.
-
-### Stronger interview description
-
-> Built an end-to-end banking risk platform that takes transaction-level data through preprocessing and feature engineering, generates ML-based fraud predictions, explains predictions using SHAP, tracks experiments with MLflow, exposes inference through FastAPI, and provides an interactive Streamlit interface with Docker-based deployment.
-
----
-
-# 📌 Project Status
-
-**Current Stage:** Active Development 🚧
-
-The project is being developed incrementally toward a complete real-world financial intelligence pipeline.
-
----
-
-# ⭐ Author
-
-**Anurag Soni**
-
-B.Tech — Artificial Intelligence / Machine Learning
-
-Interested in:
-
-- Machine Learning
-- Deep Learning
-- MLOps
-- Explainable AI
-- AI Engineering
-- Data Science
-
----
-
-# 📄 License
-
-This project is intended for educational and portfolio purposes.
-
-Add an appropriate open-source license if you plan to distribute the project for reuse.
+<!-- Add a LICENSE file (for example MIT) if others may reuse the code. -->

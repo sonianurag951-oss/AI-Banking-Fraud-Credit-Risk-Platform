@@ -222,10 +222,6 @@ def render_saved_message(message):
 def render_chatbot():
     """Render the unified Banking Risk Copilot chat interface."""
 
-    st.subheader("Banking Risk Copilot")
-    st.caption(
-        "Ask about banking risk, machine learning, or your PostgreSQL data."
-    )
 
     # Initialize history once per Streamlit session.
     if "banking_chat_history" not in st.session_state:

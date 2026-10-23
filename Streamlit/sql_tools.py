@@ -11,10 +11,6 @@ from dotenv import load_dotenv
 from sqlglot import exp
 
 
-# ---------------------------------------------------------
-# Configuration
-# ---------------------------------------------------------
-
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 load_dotenv(PROJECT_ROOT / ".env")
 
@@ -53,9 +49,6 @@ SAFE_ANONYMOUS_FUNCTIONS = {
 }
 
 
-# ---------------------------------------------------------
-# PostgreSQL connection
-# ---------------------------------------------------------
 
 def get_connection():
     required = ("PGDATABASE", "PGUSER", "PGPASSWORD")
@@ -101,9 +94,7 @@ transactions(
 """
 
 
-# ---------------------------------------------------------
 # Ollama HTTP client
-# ---------------------------------------------------------
 
 def call_ollama(messages, temperature=0, num_predict=400):
     url = f"{OLLAMA_BASE_URL}/api/chat"
@@ -133,9 +124,7 @@ def call_ollama(messages, temperature=0, num_predict=400):
     return answer.strip()
 
 
-# ---------------------------------------------------------
 # Natural language -> SQL
-# ---------------------------------------------------------
 
 def generate_sql(question):
     prompt = f"""
@@ -171,9 +160,7 @@ Rules:
     return raw_sql
 
 
-# ---------------------------------------------------------
 # Fallback SQL for common questions
-# ---------------------------------------------------------
 
 def get_fallback_sql(question):
     q = question.lower().strip()
@@ -294,9 +281,7 @@ def get_fallback_sql(question):
     return None
 
 
-# ---------------------------------------------------------
 # SQL validation
-# ---------------------------------------------------------
 
 def validate_sql(raw_sql):
     if not isinstance(raw_sql, str) or not raw_sql.strip():
@@ -405,9 +390,7 @@ def validate_sql(raw_sql):
     return tree.sql(dialect="postgres")
 
 
-# ---------------------------------------------------------
 # Execute read-only query
-# ---------------------------------------------------------
 
 def execute_query(sql):
     with get_connection() as conn:
@@ -446,9 +429,7 @@ def execute_query(sql):
     return columns, rows
 
 
-# ---------------------------------------------------------
 # Summarize database results
-# ---------------------------------------------------------
 
 def summarize(question, sql, columns, rows):
     if not rows:
@@ -493,9 +474,7 @@ def summarize(question, sql, columns, rows):
         )
 
 
-# ---------------------------------------------------------
 # Main entry point called by the Streamlit app
-# ---------------------------------------------------------
 
 def answer_database_question(question):
     if not isinstance(question, str) or not question.strip():

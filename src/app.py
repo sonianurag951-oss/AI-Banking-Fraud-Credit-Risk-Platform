@@ -1,46 +1,49 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-import pandas as pd
-import numpy as np
-import joblib
 import os
-from typing import Optional
-import warnings
-warnings.filterwarnings('ignore', category=UserWarning)
+from typing import Literal
+
+import joblib
+import keras
+import numpy as np
+import pandas as pd
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, ConfigDict, Field
 
 app = FastAPI(
     title="Credit Risk Prediction API",
-    description="Predict loan default risk using ML models",
-    version="1.0.0"
+    description="Predict loan default risk using an ANN model",
+    version="1.1.0",
 )
 
-# LOAD MODEL AND SCALER
-# Get the directory where app.py is located
+# Load model and scaler
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 models_dir = os.path.join(BASE_DIR, "Models")
 
+MODEL_PATH = os.path.join(models_dir, "credit_risk_ann.keras")
+SCALER_PATH = os.path.join(models_dir, "scaler.pkl")
 
-# Load best model (XGBoost or Logistic Regression)
+model = None
+scaler = None
+
 try:
-    model = joblib.load(os.path.join(models_dir, "credit_risk_xgb.pkl"))
-    scaler = joblib.load(os.path.join(models_dir, "scaler.pkl"))
-    print("✅ Models loaded successfully!")
+    model = keras.models.load_model(MODEL_PATH)
+    scaler = joblib.load(SCALER_PATH)
+    print("✅ ANN model and scaler loaded successfully!")
 except Exception as e:
     print(f"❌ Error loading models: {e}")
-    model = None
-    scaler = None
 
 feature_cols = [
-    'loan_amount', 'loan_term', 'interest_rate', 'monthly_income',
-    'existing_debt', 'previous_defaults', 'late_payments',
-    'age', 'income', 'credit_score', 'account_tenure', 'dependents',
-    'debt_to_income', 'loan_to_income', 'payment_burden', 'risk_score',
-    'employment_type_encoded'
+    "loan_amount", "loan_term", "interest_rate", "monthly_income",
+    "existing_debt", "previous_defaults", "late_payments",
+    "age", "income", "credit_score", "account_tenure", "dependents",
+    "debt_to_income", "loan_to_income", "payment_burden", "risk_score",
+    "employment_type_encoded",
 ]
 
-# REQUEST MODEL 
-from pydantic import BaseModel, ConfigDict
+LOW_RISK_THRESHOLD = 0.3
+HIGH_RISK_THRESHOLD = 0.6
+DECISION_THRESHOLD = 0.5  
 
+# Request model
 class LoanApplication(BaseModel):
     model_config = ConfigDict(
         json_schema_extra={
@@ -53,182 +56,148 @@ class LoanApplication(BaseModel):
                 "previous_defaults": 0,
                 "late_payments": 2,
                 "age": 32,
-                "income": 75000,
+                "income": 900000,
                 "credit_score": 720,
                 "account_tenure": 5,
                 "dependents": 2,
-                "employment_type": "Salaried"
+                "employment_type": "Salaried",
             }
         }
     )
-    
-    loan_amount: float
-    loan_term: int
-    interest_rate: float
-    monthly_income: float
-    existing_debt: float
-    previous_defaults: int
-    late_payments: int
-    age: int
-    income: float
-    credit_score: int
-    account_tenure: int
-    dependents: int
-    employment_type: str
+
+    loan_amount: float = Field(gt=0)
+    loan_term: int = Field(gt=0, le=480)
+    interest_rate: float = Field(ge=0, le=100)
+    monthly_income: float = Field(gt=0)
+    existing_debt: float = Field(ge=0)
+    previous_defaults: int = Field(ge=0)
+    late_payments: int = Field(ge=0)
+    age: int = Field(ge=18, le=100)
+    income: float = Field(gt=0)
+    credit_score: int = Field(ge=300, le=850)
+    account_tenure: int = Field(ge=0)
+    dependents: int = Field(ge=0)
+    employment_type: Literal[
+        "Salaried", "Self-employed", "Student", "Unemployed", "Retired"
+    ]
 
 
-def encode_employment_type(employment_type: str) -> int:
-    """Encode employment type to numeric value"""
-    mapping = {
-        'Salaried': 0,
-        'Self-employed': 1,
-        'Student': 2,
-        'Unemployed': 3,
-        'Retired': 4
-    }
-    return mapping.get(employment_type, 0)
+# Feature engineering
+EMPLOYMENT_MAP = {
+    "Salaried": 0,
+    "Self-employed": 1,
+    "Student": 2,
+    "Unemployed": 3,
+    "Retired": 4,
+}
+
 
 def calculate_features(data: dict) -> dict:
-    """Calculate engineered features"""
-    data['debt_to_income'] = data['existing_debt'] / data['monthly_income']
-    data['loan_to_income'] = data['loan_amount'] / (data['monthly_income'] * 12)
-    data['payment_burden'] = data['loan_amount'] / data['loan_term']
-    data['risk_score'] = (
-        0.35 * (850 - data['credit_score']) / 550
-        + 0.30 * data['debt_to_income']
-        + 0.20 * data['previous_defaults']
-        + 0.15 * data['late_payments']
+    data["debt_to_income"] = data["existing_debt"] / data["monthly_income"]
+    data["loan_to_income"] = data["loan_amount"] / (data["monthly_income"] * 12)
+    data["payment_burden"] = data["loan_amount"] / data["loan_term"]
+    data["risk_score"] = (
+        0.35 * (850 - data["credit_score"]) / 550
+        + 0.30 * data["debt_to_income"]
+        + 0.20 * data["previous_defaults"]
+        + 0.15 * data["late_payments"]
     )
-    data['employment_type_encoded'] = encode_employment_type(data['employment_type'])
+    data["employment_type_encoded"] = EMPLOYMENT_MAP[data["employment_type"]]
     return data
 
-def predict_risk(features: list) -> dict:
-    """Make prediction and return risk assessment"""
+
+# Prediction
+def risk_from_probability(probability: float) -> tuple[str, str]:
+    if probability < LOW_RISK_THRESHOLD:
+        return "Low Risk", "Approve loan"
+    if probability < HIGH_RISK_THRESHOLD:
+        return "Medium Risk", "Review manually"
+    return "High Risk", "Reject loan"
+
+
+def score_applications(applications: list[LoanApplication]) -> list[dict]:
+    """Score one or many applications with a single model call."""
     if model is None or scaler is None:
-        raise HTTPException(status_code=500, detail="Model not loaded")
-    
-    # Scale features
-    features_scaled = scaler.transform([features])
-    
-    # Predict
-    prediction = model.predict(features_scaled)[0]
-    probability = model.predict_proba(features_scaled)[0][1]
-    
-    # Risk category
-    if probability < 0.3:
-        risk_category = "Low Risk"
-        recommendation = "Approve loan"
-    elif probability < 0.6:
-        risk_category = "Medium Risk"
-        recommendation = "Review manually"
-    else:
-        risk_category = "High Risk"
-        recommendation = "Reject loan"
-    
-    return {
-        "prediction": int(prediction),
-        "default_probability": round(float(probability), 4),
-        "risk_category": risk_category,
-        "recommendation": recommendation
-    }
+        raise HTTPException(status_code=503, detail="Model not loaded")
 
-#  API ENDPOINTS
+    enriched = []
+    rows = []
+    for application in applications:
+        data = calculate_features(application.model_dump())
+        enriched.append(data)
+        rows.append([data[col] for col in feature_cols])
 
+    # DataFrame
+    X = pd.DataFrame(rows, columns=feature_cols)
+    X_scaled = scaler.transform(X)
+    probabilities = model.predict(X_scaled, verbose=0).flatten()
+
+    results = []
+    for data, probability in zip(enriched, probabilities):
+        probability = float(probability)
+        category, recommendation = risk_from_probability(probability)
+        results.append({
+            "prediction": int(probability >= DECISION_THRESHOLD),
+            "default_probability": round(probability, 4),
+            "risk_category": category,
+            "recommendation": recommendation,
+            "input_data": data,
+        })
+    return results
+
+# endpoint
 @app.get("/")
 def read_root():
-    """Health check endpoint"""
     return {
         "status": "online",
-        "model": "Credit Risk Prediction",
-        "version": "1.0.0"
+        "model": "Credit Risk Prediction (ANN)",
+        "version": "1.1.0",
     }
+
 
 @app.get("/health")
 def health_check():
-    """Check if model is loaded"""
-    if model is not None:
-        return {"status": "healthy", "model_loaded": True}
-    else:
-        return {"status": "unhealthy", "model_loaded": False}
+    loaded = model is not None and scaler is not None
+    return {
+        "status": "healthy" if loaded else "unhealthy",
+        "model_loaded": loaded,
+    }
+
 
 @app.post("/predict")
 def predict_loan_default(application: LoanApplication):
-    """
-    Predict loan default risk for a loan application
-    
-    Returns:
-    - prediction: 0 (No Default) or 1 (Default)
-    - default_probability: Probability of default (0-1)
-    - risk_category: Low/Medium/High Risk
-    - recommendation: Approve/Review/Reject
-    """
+    """Predict default risk for one loan application."""
     try:
-        # Convert to dict
-        data = application.model_dump()
-        
-        # Calculate engineered features
-        data = calculate_features(data)
-        
-        # Extract features in correct order
-        features = [data[col] for col in feature_cols]
-        
-        # Make prediction
-        result = predict_risk(features)
-        
-        # Add input data to response
-        result["input_data"] = data
-        
-        return result
-    
+        return score_applications([application])[0]
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.post("/predict-batch")
 def predict_batch_loans(applications: list[LoanApplication]):
-    """
-    Predict loan default risk for multiple loan applications
-    """
+    """Predict default risk for multiple loan applications."""
     try:
-        results = []
-        for application in applications:
-            data = application.model_dump()
-            data = calculate_features(data)
-            features = [data[col] for col in feature_cols]
-            result = predict_risk(features)
-            result["input_data"] = data
-            results.append(result)
-        
-        return {
-            "total_predictions": len(results),
-            "predictions": results
-        }
-    
+        results = score_applications(applications)
+        return {"total_predictions": len(results), "predictions": results}
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @app.get("/feature-importance")
 def get_feature_importance():
-    """
-    Get feature importance from the model (if available)
-    """
-    try:
-        if hasattr(model, 'feature_importances_'):
-            importance_df = pd.DataFrame({
-                'feature': feature_cols,
-                'importance': model.feature_importances_
-            }).sort_values('importance', ascending=False)
-            
-            return {
-                "feature_importance": importance_df.to_dict('records')
-            }
-        else:
-            return {"message": "Feature importance not available for this model"}
-    
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    """ANN has no built-in feature importance."""
+    return {
+        "message": (
+            "Feature importance is not available for the ANN model. "
+            "See the SHAP plots saved in the Results folder."
+        )
+    }
 
 
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True)
-

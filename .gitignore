@@ -1,8 +1,19 @@
+# Secrets
 .env
-.env.*
-!.env.example
+# Python
 __pycache__/
-*.py[cod]
-.venv/
+*.pyc
 venv/
+.venv/
+.ipynb_checkpoints/
+# MLflow runs 
 mlruns/
+mlartifacts/
+
+Models/credit_risk_rf.pkl
+Models/credit_risk_xgb.pkl
+Models/credit_risk_lr.pkl
+
+# OS / editor
+.DS_Store
+.vscode/
