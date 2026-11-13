@@ -129,10 +129,8 @@ def call_ollama(messages, temperature=0, num_predict=400):
 def generate_sql(question):
     prompt = f"""
 You generate PostgreSQL SELECT queries for a banking analytics assistant.
-
 Available schema:
 {schema_for_prompt()}
-
 Rules:
 - Return one SQL query only. Do not use Markdown fences.
 - Use only the tables and columns in the supplied schema.

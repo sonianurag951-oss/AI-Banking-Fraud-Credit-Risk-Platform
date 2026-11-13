@@ -1,7 +1,13 @@
 
 import os
 from pathlib import Path
+import warnings
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+warnings.filterwarnings("ignore", category=FutureWarning)
+tf.get_logger().setLevel("ERROR")
 import joblib
 import keras
 import matplotlib.pyplot as plt
